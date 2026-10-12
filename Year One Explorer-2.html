@@ -1,0 +1,445 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Year One Explorer</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: a magazine-cover poster of solid color blocks, each a giant counting number; a full-width month chart closes the cover; any block opens a detail drawer underneath. Committed single dark look. */
+:root{
+  --bg:#0E0F13; --surface:#17181F; --ink:#F2F2F0; --ink-2:#B9BAC2; --ink-3:#8A8C96; --rule:#2A2C35; --chip:#1F2029; --hover:#1C1D25;
+  --red:#E80022; --red-ui:#FF4257; --blue:#4F78C9; --blue-ui:#6A90DD; --yellow:#FFD071; --paper:#F2F0EB; --black:#16171C;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --body:Arial,"Helvetica Neue",Helvetica,sans-serif;
+  --mono:"IBM Plex Mono",ui-monospace,Menlo,monospace;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{background:var(--bg);color:var(--ink);font-family:var(--body);font-size:15px;line-height:1.5;padding:0 16px}
+.wrap{max-width:1240px;margin:0 auto;padding-block:28px 64px;display:flex;flex-direction:column;gap:6px}
+h1,h2,h3{font-family:var(--display);margin:0;text-wrap:balance}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--yellow);outline-offset:2px}
+.num{font-variant-numeric:tabular-nums}
+
+/* masthead */
+.mast{display:flex;justify-content:space-between;align-items:end;gap:12px 24px;flex-wrap:wrap;padding-bottom:14px}
+.mast h1{font-size:clamp(30px,4.6vw,58px);font-weight:900;font-stretch:68%;line-height:.9;text-transform:uppercase;letter-spacing:.005em}
+.mast .meta{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3);text-align:right;line-height:1.6}
+
+/* poster grid */
+.poster{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px}
+.blk{position:relative;overflow:hidden;border:0;text-align:left;cursor:pointer;padding:clamp(16px,2.2vw,28px);display:flex;flex-direction:column;justify-content:space-between;gap:14px;min-height:260px;transition:filter .15s}
+.blk:hover{filter:brightness(1.06)}
+.blk .k{font-family:var(--mono);font-size:12px;letter-spacing:.1em;text-transform:uppercase;display:flex;justify-content:space-between;gap:10px;position:relative;z-index:1}
+.blk .k .go{transition:transform .2s}
+.blk:hover .go,.blk[aria-expanded="true"] .go{transform:translateX(4px)}
+.blk[aria-expanded="true"]{box-shadow:inset 0 0 0 4px var(--ink)}
+.blk .big{font-family:var(--display);font-weight:900;font-stretch:62%;line-height:.78;letter-spacing:-.01em;font-variant-numeric:tabular-nums;position:relative;z-index:1}
+.blk .lab{font-family:var(--display);font-weight:800;font-stretch:75%;text-transform:uppercase;line-height:.95;position:relative;z-index:1}
+.blk .note{font-size:14px;max-width:38ch;position:relative;z-index:1;opacity:.9}
+
+.b-sites{grid-column:span 8;grid-row:span 2;background:var(--red);color:#fff;min-height:520px}
+.b-sites .big{font-size:clamp(150px,24vw,330px)}
+.b-sites .lab{font-size:clamp(34px,4.4vw,60px)}
+.b-co{grid-column:span 4;grid-row:span 2;background:var(--surface);color:var(--ink);box-shadow:inset 0 0 0 1px var(--rule)}
+.b-co .big{font-size:clamp(110px,13vw,190px);color:var(--ink)}
+.b-co .lab{font-size:clamp(28px,2.8vw,40px)}
+.b-co ol{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:2px;position:relative;z-index:1}
+.b-co li{display:flex;justify-content:space-between;gap:10px;font-family:var(--display);font-weight:700;font-stretch:80%;font-size:clamp(17px,1.6vw,22px);border-top:1px solid var(--rule);padding-top:4px}
+.b-co li span{font-family:var(--mono);font-size:13px;font-weight:500;color:var(--red-ui)}
+.b-files{grid-column:span 4;background:var(--blue);color:#fff}
+.b-pages{grid-column:span 4;background:var(--yellow);color:var(--black)}
+.b-arts{grid-column:span 4;background:var(--paper);color:var(--black)}
+.b-files .big,.b-pages .big,.b-arts .big{font-size:clamp(96px,10vw,150px)}
+.b-files .lab,.b-pages .lab,.b-arts .lab{font-size:clamp(24px,2.4vw,32px)}
+
+/* faceplate texture inside the red block: all 451 sites */
+.texture{position:absolute;right:-8px;top:54px;width:56%;display:flex;flex-wrap:wrap;gap:4px;justify-content:flex-end;opacity:1;pointer-events:none}
+.texture i{width:11px;height:17px;border-radius:2px;background:#fff;opacity:.16;animation:drop .5s both}
+.texture i.d{opacity:.42}
+@keyframes drop{from{transform:translateY(-10px) scale(.6)}to{transform:none}}
+
+/* page-chip texture inside yellow + paper */
+.stack{position:absolute;right:16px;bottom:16px;display:flex;flex-direction:column;gap:3px;align-items:flex-end;pointer-events:none}
+.stack i{display:block;height:5px;background:currentColor;opacity:.22}
+
+/* full-width chart */
+.chartblk{grid-column:1/-1;background:var(--surface);box-shadow:inset 0 0 0 1px var(--rule);padding:clamp(16px,2.2vw,28px);display:flex;flex-direction:column;gap:10px}
+.chartblk .top{display:flex;justify-content:space-between;align-items:end;gap:12px 24px;flex-wrap:wrap}
+.chartblk h2{font-size:clamp(28px,3.4vw,46px);font-weight:900;font-stretch:68%;text-transform:uppercase;line-height:.95}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2)}
+.legend i{display:inline-block;width:10px;height:14px;border-radius:2px;margin-right:6px;vertical-align:-2px}
+.yearchart{overflow-x:auto}
+.yearchart svg{width:100%;min-width:640px;height:auto;display:block}
+.yearchart text{font-family:var(--mono);font-size:12px;fill:var(--ink-3)}
+.yearchart .val{fill:var(--ink);font-size:13px;font-weight:500}
+.yearchart .mo{fill:var(--ink-2);font-size:13px}
+.yearchart .grow{transform-box:fill-box;transform-origin:50% 100%;animation:grow .7s cubic-bezier(.2,.8,.2,1) both}
+@keyframes grow{from{transform:scaleY(0)}to{transform:none}}
+.yearchart .col{cursor:pointer;outline:none}
+.yearchart .col:focus-visible .hl{stroke:var(--yellow);stroke-width:2}
+.yearchart .col:hover .hl,.yearchart .col.sel .hl{fill:var(--chip)}
+.yearchart .col.sel .mo{fill:var(--ink);font-weight:500}
+.hint{font-size:13px;color:var(--ink-3)}
+
+@media (max-width:900px){
+  .b-sites,.b-co{grid-column:1/-1;grid-row:auto}
+  .b-sites{min-height:420px}
+  .b-files,.b-pages,.b-arts{grid-column:span 6}
+  .b-arts{grid-column:1/-1}
+}
+@media (max-width:560px){
+  .b-files,.b-pages,.b-arts{grid-column:1/-1}
+  .texture{width:62%;top:44px;max-height:150px;overflow:hidden;opacity:.7}
+  .mast .meta{text-align:left}
+}
+
+/* drawer */
+.drawer{background:var(--surface);border-top:6px solid var(--k,var(--red));padding:24px clamp(16px,3vw,32px) 30px;display:flex;flex-direction:column;gap:20px;min-width:0;animation:slide .35s cubic-bezier(.2,.8,.2,1);scroll-margin-top:12px}
+@keyframes slide{from{transform:translateY(-14px)}to{transform:none}}
+.phead{display:flex;justify-content:space-between;gap:16px;align-items:start;flex-wrap:wrap}
+.phead h2{font-size:clamp(30px,4vw,52px);font-weight:900;font-stretch:66%;line-height:.95;text-transform:uppercase}
+.phead p{margin:8px 0 0;color:var(--ink-2);max-width:66ch}
+.close{border:1px solid var(--ink);background:transparent;padding:7px 12px;font-family:var(--mono);font-size:12px;text-transform:uppercase;letter-spacing:.06em;cursor:pointer}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--rule);background:var(--bg);padding:5px 11px;font-size:13px;cursor:pointer;border-radius:999px}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.chip i{display:inline-block;width:8px;height:12px;border-radius:2px;margin-right:6px;vertical-align:-1px}
+.split{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:28px}
+@media (max-width:820px){.split{grid-template-columns:1fr}}
+.split > *{min-width:0}
+.mtitle{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:10px}
+.mtitle h3{font-size:24px;font-weight:800;font-stretch:78%;text-transform:uppercase}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-3)}
+.tiles{display:flex;flex-wrap:wrap;gap:4px}
+.tile{width:14px;height:22px;border-radius:2px;position:relative}
+.tile::before{content:"";position:absolute;left:3px;right:3px;top:5px;height:1.5px;background:var(--surface);opacity:.85}
+.tile.d{background:var(--red-ui)} .tile.m{background:var(--blue-ui)}
+.list{border-top:1px solid var(--rule);max-height:380px;overflow:auto}
+.row{display:grid;grid-template-columns:12px minmax(0,1fr) auto;gap:10px;align-items:center;padding:7px 4px;border-bottom:1px solid var(--rule);font-size:14px}
+.row .dot{width:8px;height:12px;border-radius:2px}
+.row .t{min-width:0}
+.row .t span{display:block;font-size:12px;color:var(--ink-3);font-family:var(--mono);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.row .r{font-family:var(--mono);font-size:12px;color:var(--ink-2);white-space:nowrap}
+.search{width:100%;max-width:360px;padding:9px 12px;border:1px solid var(--rule);background:var(--bg);color:var(--ink);font:inherit}
+.co{border-bottom:1px solid var(--rule)}
+.cobtn{width:100%;display:grid;grid-template-columns:minmax(120px,190px) 1fr 40px 16px;gap:12px;align-items:center;background:none;border:0;padding:8px 2px;cursor:pointer;text-align:left}
+.cobtn:hover{background:var(--hover)}
+.cobtn .n{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.cobtn .c{font-family:var(--mono);font-size:13px;text-align:right}
+.cobtn .x{font-family:var(--mono);color:var(--ink-3);transition:transform .2s}
+.co.open .cobtn .x{transform:rotate(45deg);color:var(--red-ui)}
+.co.open .cobtn .n{color:var(--red-ui);font-weight:700}
+.cbar{display:flex;gap:2px;height:10px}
+.cbar .d{background:var(--red-ui)} .cbar .m{background:var(--blue-ui)}
+.cbar span:last-child{border-radius:0 3px 3px 0}
+.colist{padding:2px 0 12px 14px}
+.colist .row{font-size:13px;padding:5px 4px}
+.cowrap{max-height:540px;overflow:auto;border-top:1px solid var(--rule)}
+@media (max-width:560px){.cobtn{grid-template-columns:110px 1fr 32px 12px;gap:8px}}
+.hbar{display:grid;grid-template-columns:minmax(120px,240px) 1fr 34px;gap:10px;align-items:center;font-size:13.5px;padding:4px 0}
+.hbar .n{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.hbar .n small{color:var(--ink-3)}
+.split-total{display:flex;height:40px;gap:2px}
+.split-total div{display:flex;align-items:center;padding:0 12px;color:#fff;font-family:var(--mono);font-size:12.5px;white-space:nowrap;overflow:hidden}
+.kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:14px}
+.kv div{border-left:3px solid var(--k,var(--ink));padding:2px 0 2px 10px}
+.kv b{font-family:var(--display);font-size:34px;font-weight:900;font-stretch:70%;display:block;line-height:1.05}
+.kv span{font-size:12.5px;color:var(--ink-2)}
+.board{display:grid;grid-template-columns:repeat(7,minmax(140px,1fr));gap:2px;overflow-x:auto;padding-bottom:6px}
+.bcol{background:var(--bg);border-top:3px solid var(--ink);padding:10px 8px 12px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.bcol h3{font-size:22px;font-weight:800;font-stretch:75%;display:flex;justify-content:space-between;align-items:baseline;text-transform:uppercase}
+.bcol h3 span{font-family:var(--mono);font-size:11px;font-weight:500;color:var(--ink-3)}
+.pg{display:block;font-size:12.5px;line-height:1.3;padding:6px 8px;background:var(--chip);border-left:3px solid var(--k,var(--ink-3));color:var(--ink);text-decoration:none}
+.pg:hover{background:var(--hover);text-decoration:underline}
+.pg.sol{--k:var(--red-ui)} .pg.ind{--k:var(--blue-ui)} .pg.cs{--k:var(--yellow)} .pg.ins{--k:var(--paper)}
+.pg.dim{opacity:.18}
+@media (max-width:560px){.board{grid-template-columns:1fr;overflow:visible}}
+.arts{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:28px}
+.art{display:grid;grid-template-columns:62px 1fr;gap:10px;padding:9px 2px;border-bottom:1px solid var(--rule);text-decoration:none;color:var(--ink);font-size:14px}
+.art:hover{background:var(--hover)}
+.art time{font-family:var(--mono);font-size:12px;color:var(--ink-3);padding-top:2px}
+.bars svg{width:100%;height:auto;display:block}
+.bars text{font-family:var(--mono);font-size:11px;fill:var(--ink-3)}
+.bars .val{fill:var(--ink);font-weight:500}
+.bars .hit{cursor:pointer}
+.bars .hit:hover rect.bg,.bars .sel rect.bg{fill:var(--chip)}
+.bars .sel text.m{fill:var(--ink);font-weight:500}
+#tip{position:fixed;pointer-events:none;background:var(--paper);color:var(--black);padding:7px 10px;font-size:12.5px;line-height:1.35;max-width:240px;z-index:10;opacity:0;border-radius:2px}
+#tip b{display:block;font-family:var(--display)}
+footer{font-size:13px;color:var(--ink-3);border-top:1px solid var(--rule);padding-top:14px;margin-top:22px;max-width:84ch}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+
+<div class="wrap">
+  <div class="mast">
+    <h1>Year one<br>at Sitemetric</h1>
+    <div class="meta">Josefina Poventud<br>Senior Visual Designer<br>Oct 2025 – Oct 2026</div>
+  </div>
+
+  <div class="poster" id="poster">
+    <button type="button" class="blk b-sites" data-id="sites" aria-expanded="false">
+      <div class="k"><span>Badge faceplates</span><span class="go">Explore →</span></div>
+      <div class="texture" id="texture" aria-hidden="true"></div>
+      <div>
+        <div class="big" data-count="451">451</div>
+        <div class="lab">Job sites badged</div>
+      </div>
+      <div class="note">Every Sitemetric worker badge starts with a faceplate. 227 I designed and posted to the site channel; 224 I loaded into automated badge printing.</div>
+    </button>
+
+    <button type="button" class="blk b-co" data-id="companies" aria-expanded="false">
+      <div class="k"><span>Who I badged</span><span class="go">Explore →</span></div>
+      <div>
+        <div class="big" data-count="93">93</div>
+        <div class="lab">Companies</div>
+      </div>
+      <ol id="topco"></ol>
+    </button>
+
+    <button type="button" class="blk b-files" data-id="files" aria-expanded="false">
+      <div class="k"><span>Files shipped</span><span class="go">Explore →</span></div>
+      <div>
+        <div class="big" data-count="885" data-prefix="~">~885</div>
+        <div class="lab">Faceplate files</div>
+      </div>
+      <div class="note">323 PNGs posted, 562 loaded in ZIPs.</div>
+    </button>
+
+    <button type="button" class="blk b-pages" data-id="pages" aria-expanded="false">
+      <div class="k"><span>sitemetric.com</span><span class="go">Explore →</span></div>
+      <div class="stack" aria-hidden="true" id="pstack"></div>
+      <div>
+        <div class="big" data-count="30">30</div>
+        <div class="lab">Web pages live</div>
+      </div>
+      <div class="note">Solutions, Industries, customer stories and more.</div>
+    </button>
+
+    <button type="button" class="blk b-arts" data-id="articles" aria-expanded="false">
+      <div class="k"><span>Long-form content</span><span class="go">Explore →</span></div>
+      <div class="stack" aria-hidden="true" id="astack"></div>
+      <div>
+        <div class="big" data-count="18">18</div>
+        <div class="lab">Insights and guides</div>
+      </div>
+      <div class="note">5 Insights articles, 13 resource guides.</div>
+    </button>
+
+    <div class="chartblk">
+      <div class="top">
+        <h2>The year, month by month</h2>
+        <div class="legend">
+          <span><i style="background:var(--red-ui)"></i>Sites designed and posted</span>
+          <span><i style="background:var(--blue-ui)"></i>Sites in automated printing</span>
+          <span><i style="background:var(--yellow)"></i>Web page</span>
+          <span><i style="background:var(--paper)"></i>Insight or guide</span>
+        </div>
+      </div>
+      <div class="yearchart" id="yearchart"></div>
+      <div class="hint">Click a month to open everything I shipped in it.</div>
+    </div>
+  </div>
+
+  <div id="drawerslot"></div>
+
+  <footer>Job sites and faceplates come from my Slack uploads (Oct 14, 2025 – Oct 9, 2026): PNGs posted to #reg and #icomm channels and DMs, and ZIPs sent to #automated-badge-printing. Demos, mockups and visitor or 30-day templates are left out. Web pages are live pages on sitemetric.com that I worked on; Insights and guides are published CMS items.</footer>
+</div>
+<div id="tip" role="tooltip"></div>
+
+<script>
+const {B,P}={"B":[["Haskell","JAN200","2025-10-14",1,3,6,"reg-haskell-jan200"],["HITT","TI Campus","2025-10-15",1,1,0,"reg-hitt-ti-campus"],["Clayco","WCK","2025-10-16",1,1,0,"reg-ct-cumberland-wck"],["Clayco","AWS Avondale","2025-10-17",1,1,0,"reg-clayco-aws-phx"],["Switch Inc","RNO Other Campus Projects","2025-10-17",1,1,0,"reg-switch-rno-other-campus-projects"],["HITT","DLR-25-DFW39","2025-10-20",1,1,0,"reg-hitt-dlr-25-dfw39"],["HITT","DLR-25-DFW44","2025-10-20",1,1,0,"reg-hitt-dlr-25-dfw44"],["Suffolk","PHL 109-110","2025-10-20",1,1,0,"reg-suffolk-phl100-105-campus"],["Whiting-Turner","UTSW FTW Rad Onc","2025-10-20",1,2,0,"reg-whiting-turner-utsw-ftw-rad-onc"],["Whiting-Turner","Sams Club Katy TX - 021505","2025-10-21",1,1,0,"reg-whiting-turner-sams-club-katy-tx-021505"],["Alberici Constructors","Cedar River RICE Power Plant","2025-10-22",1,1,0,"reg-alberici-constructors-cedar-river-rice-power-plant"],["CSI","Chalan Solar","2025-10-22",1,7,0,"reg-csi-chalan-solar"],["Brasfield & Gorrie","ATL2 DC3","2025-10-23",1,1,1,"reg-brasfield-and-gorrie-qts-atl2-dc3"],["HITT","TI Fitout IAD 533","2025-10-23",1,1,0,"reg-hitt-ti-fitout-iad-533"],["Whiting-Turner","LCT2 Fusion","2025-10-23",1,1,1,"reg-whiting-turner-lct2-fusion"],["Whiting-Turner","Moffitt Pasco Research Facility","2025-10-23",1,1,0,"reg-whiting-turner-moffitt-pacso-research-facility"],["Suffolk","IAD 215 ROMP 6-10","2025-10-24",1,1,1,"reg-suffolk-iad-215-romp-6-10"],["HITT","CoreWeave KWO-01","2025-10-27",1,2,4,"reg-hitt-coreweave-kwo-01"],["Layton","LFDriscoll DC 6","2025-10-27",1,2,0,"reg-layton-lfdriscoll-dc-6"],["Integra","Dalton GA","2025-10-28",1,1,0,"reg-integra-dnn4"],["Holder","MDC1","2025-10-29",1,1,0,"reg-holder-mdc1"],["Coakley & Williams","Grand Hyatt","2025-10-31",1,1,1,"reg-coakley-and-williams-grand-hyatt"],["Suffolk","PDX 112","2025-10-31",1,1,0,"reg-suffolk-pdx-112"],["DPR","ATHENA","2025-11-03",1,2,3,"reg-dpr-athena / #icomm-dpr-athena"],["Clayco","Project Miner","2025-11-04",1,5,0,"reg-clayco-project-miner"],["HITT","DLR Gold Sterling","2025-11-04",1,1,0,"reg-hitt-dlr-gold-sterling"],["DPR","Hutto 2 FUFO","2025-11-05",1,1,0,"reg-dpr-hutto-2-fufo"],["Holder","Mustang ADC4","2025-11-05",1,2,0,"reg-holder-mustang-adc4"],["Holder","Mustang ADC5","2025-11-05",1,2,0,"reg-holder-mustang-adc5"],["Ryan Companies","MKE-3","2025-11-06",1,1,1,"reg-ryan-companies-mke-3"],["STO (Rogers-O'Brien/Suffolk)","DFW2 Wilmer Campus","2025-11-06",1,1,1,"reg-sto-rogers-obrien-suffolk-dfw2-wilmer-campus"],["Coakley & Williams","Ambulatory Care Center","2025-11-07",1,1,1,"reg-coakley-and-williams-ambulatory-care-center"],["Integra","LAN 01 Fit Up","2025-11-10",1,1,0,"reg-ccm-lan01-fit-out"],["Clack","EWM","2025-11-11",1,1,0,"reg-clark-ewm"],["HITT","Yondr NOV2A","2025-11-11",1,1,1,"reg-hitt-yondr-nov2a"],["Primoris","Project 24004 Fermi LLC","2025-11-11",1,1,0,"reg-primoris-renewable-energy-project-24004-fermi-llc"],["Skanska","ATL 089","2025-11-11",1,1,1,"reg-skanska-atl089"],["Switch Inc","Keep 2.0","2025-11-11",1,3,5,"reg-hcl-critical-switch-keep-2"],["Ryan Companies","Operations MW-1","2025-11-12",1,1,0,"reg-ryan-companies-mw-1"],["Coakley & Williams","Washington Reid Preschool Center","2025-11-13",1,1,1,"reg-coakley-and-williams-washington-reid-preschool-center"],["Gray Construction","PDX 186","2025-11-14",1,1,1,"reg-gray-construction-pdx-186"],["Layton","QTS SLC1 Data Center Campus","2025-11-14",1,5,7,"reg-layton-qts-slc1-data-center-campus"],["CTS Lonestar","THM","2025-11-17",1,2,3,"reg-cts-lonestar-thm"],["Evans","CLT1","2025-11-18",1,1,0,"reg-evans-clt1-dc2"],["Parkhill","Project Matador","2025-11-19",1,11,11,"reg-parkhill-project-matador"],["Walbridge","AWS - Hamlet, NC - CLT 100 - Enabling Works","2025-11-19",1,1,1,"reg-walbridge-aws-hamlet-nc-clt-100-enabling-works"],["Whiting-Turner","JHU (DSAI) 020830","2025-11-19",1,1,0,"reg-whiting-turner-jhu-dsai-020830"],["HITT","Osgood DC5","2025-11-21",1,1,3,"reg-hitt-qts-atl2-dc5"],["Microsoft","IAD24","2025-11-25",1,1,0,"reg-securitas-redbrick-iad24"],["Holder","CFC","2025-11-26",1,1,1,"reg-holder-mustang-cfc"],["Turner","IAD-04","2025-11-26",1,2,3,"reg-turner-iad04-iad06-off-site-parking-lot"],["Coakley & Williams","NAVFAC CBD Large Volume","2025-11-28",1,1,1,"reg-coakley-and-williams-navfac-cbd-large-volume"],["Compu-Dynamics","TX21 San Antonio","2025-11-28",1,1,2,"reg-compudynamics-tx21-san-antonio"],["DPR","Vantage TX22","2025-12-01",1,1,2,"reg-dpr-vantage-tx22"],["Saint-Gobain","NorPro","2025-12-01",1,1,1,""],["Coakley & Williams","818 Connecticut Ave","2025-12-02",1,1,1,"reg-coakley-and-williams-818-connecticut-ave"],["X-Wavetech","Cedarville","2025-12-03",1,1,0,"reg-x-wavetech-cedarville"],["Ryan Companies","ATL 089","2025-12-04",1,8,0,"reg-ryan-companies-atl089"],["Webcor","RNO ConRAC QD","2025-12-05",1,2,0,"reg-webcor-rno-conrac"],["HITT","QTS RIC5: HITT","2025-12-08",1,1,1,"reg-hitt-qts-ric5"],["Amtrak","Incident Response (faceplate back)","2025-12-09",1,2,0,""],["Clune","232951 - Aligned DFW03","2025-12-09",1,1,1,"reg-clune-aligned-dfw03"],["Whiting-Turner","Walmart Distribution De-Rack - Laurens SC 021547","2025-12-09",1,2,0,"reg-whiting-turner-walmart-distribution-de-rack-laurens-sc-021547"],["HITT","HTX2 Apollo","2025-12-10",1,1,1,"reg-hitt-htx2-apollo"],["Hourigan","QTS RIC28","2025-12-10",1,1,1,"reg-hourigan-qts-ric28"],["Whiting-Turner","TX-12","2025-12-10",1,1,0,"reg-whiting-turner-tx-12"],["Clack","IAD 205","2025-12-15",0,0,1,""],["Clayco","HKT Clarksville Campus","2025-12-15",0,0,2,""],["Clayco","HKT Contractors","2025-12-15",0,0,2,""],["Clune","NTT VA11","2025-12-15",0,0,1,""],["EE Reed","D2 Tech Park","2025-12-15",0,0,1,""],["Gilbane","QTS CLT1 GBCO Campus","2025-12-15",1,1,2,"reg-gilbane-qts-clt1-gbco-campus"],["HITT","AVC02","2025-12-15",0,0,1,""],["HITT","AVC17-19","2025-12-15",0,0,2,""],["HITT","Meta ATG 1 iGMP","2025-12-15",0,0,1,""],["HITT","PointOne Remington","2025-12-15",0,0,1,""],["ProLogis","UPS Warehouse Shrewsbury","2025-12-15",0,0,1,""],["T5 Data Centers","CS-Dalton01","2025-12-15",0,0,1,""],["T5 Data Centers","KM1","2025-12-15",1,1,1,"reg-t5-data-center-km2"],["The Conlan Company","OLV1","2025-12-15",0,0,1,""],["Whiting-Turner","The Line","2025-12-15",1,1,1,"reg-whiting-turner-the-line"],["Brasfield & Gorrie","Prologis Commerce Center III","2025-12-16",0,0,1,""],["Clune","Menlo Equities McLearen","2025-12-16",0,0,1,""],["HITT","QTS DFW 20-Hawk","2025-12-16",0,0,2,""],["HITT","QTS DFW 22-Hawk","2025-12-16",0,0,4,""],["Holder","Mustang HJS","2025-12-16",1,2,1,"reg-holder-mustang-hjs"],["Rosendin Electric","GCDC Building 3","2025-12-16",0,0,1,""],["Advantage Dirt Contractors","EAT13","2025-12-17",0,0,1,""],["HITT","DLR DFW37","2025-12-17",0,0,1,""],["HITT","Stack NVA06A","2025-12-17",0,0,1,""],["Holder","Mustang Red Bldg 1","2025-12-17",0,0,1,""],["Skanska","MSFT FTY Campus","2025-12-17",0,0,2,""],["Bozzuto","Avonlea Senior","2025-12-18",0,0,1,""],["Coakley & Williams","Kite Pharma - Phase One","2025-12-18",1,1,1,"reg-coakley-and-williams-kite-pharma-phase-one"],["DPR","IAD 56","2025-12-18",0,0,1,""],["EE Reed","Stack Avanti YFT Campus","2025-12-18",0,0,1,""],["HITT","IAD 350","2025-12-18",0,0,1,""],["Whiting-Turner","IAD 313","2025-12-18",0,0,1,""],["Bozzuto","Inwood Senior Living","2025-12-19",1,1,1,"reg-bozzuto-inwood-senior-living"],["Clack","IAD157-158","2025-12-22",0,0,1,""],["Clark","IAD 124-127","2025-12-22",0,0,1,""],["EE Reed","IAD 667","2025-12-22",0,0,1,""],["EE Reed","Manassas Tech IAD 045","2025-12-22",0,0,1,""],["HITT","Project Brickyard","2025-12-22",0,0,1,""],["Whiting-Turner","QTS MAN1 Campus","2025-12-22",0,0,2,""],["EE Reed","Pacific Ashburn","2025-12-23",0,0,1,""],["HITT","LVL 04-07","2025-12-23",0,0,3,""],["Clune","QTS Sterling VA","2025-12-24",0,0,1,""],["Coakley & Williams","SMITHSONIAN NZP-VA RENEW","2025-12-24",1,1,1,"reg-coakley-and-williams-smithsonian-nzp-va-renew"],["CSI","Baldy Mesa","2025-12-26",0,0,1,""],["HITT","QTS RIC3 DC3","2025-12-26",1,1,1,"reg-hitt-qts-ric3-dc3"],["HITT","TI FITOUT IAD 245 BUILDINGS C E F","2025-12-29",0,0,1,""],["HITT-DPR","iad44 45-59 campus","2025-12-29",1,1,1,"reg-dpr-hitt-iad44-45-59-campus"],["Hensel Phelps","Johns Hopkins Applied Physics Lab","2025-12-29",0,0,1,""],["HITT","LYH03","2025-12-30",1,1,0,"reg-hitt-lyh03"],["Rosendin Electric","DC17","2025-12-30",1,1,1,"reg-rosendin-electric-dc17"],["Suffolk","IAD 18","2025-12-30",0,0,1,""],["Suffolk","IAD 230","2025-12-30",0,0,1,""],["Suffolk","IAD 421","2025-12-30",0,0,1,""],["Bozzuto","Belmont Crossing Phase 2 2A-2B","2025-12-31",0,0,1,""],["Bozzuto","Keys Pointe 2A","2025-12-31",0,0,1,""],["Clark","Capital One Arena","2025-12-31",1,1,3,"reg-clark-capital-one-arena"],["HITT","SDC Tarpon","2025-12-31",0,0,1,""],["Rosendin Electric","Vantage VA15","2025-12-31",0,0,1,""],["Trinity","ARA HUB","2025-12-31",0,0,1,""],["Clark","Inova Alexandria at Landmark","2026-01-02",1,1,1,"reg-clark-inova-alexandria-at-landmark"],["HITT","DLR Gold Manassas","2026-01-02",0,0,1,""],["HITT","HITT Headquarters","2026-01-02",0,0,2,""],["HITT","IAD 500","2026-01-02",0,0,1,""],["HITT","MAN1 DC5","2026-01-02",0,0,1,""],["HITT","NVA10","2026-01-02",0,0,1,""],["Manhattan Construction Group","SWR1A","2026-01-02",1,1,3,"reg-manhattan-construction-group-swr1a-project-rohan-datacenter"],["Whiting-Turner","IAD 193","2026-01-02",0,0,1,""],["Holder","Mustang MNO","2026-01-05",1,1,0,"reg-holder-mustang-mno-campus"],["Switch Inc","LAS17&LAS18 Campus","2026-01-05",1,1,1,"reg-switch-las17-and-las18-campus"],["Turner","IAD04-09 Campus","2026-01-05",1,3,0,"reg-gilbane-turner-iad04-09"],["HITT","Cosmos","2026-01-06",1,1,1,"reg-hitt-cosmos"],["Whiting-Turner","Project Lighthouse","2026-01-06",1,1,1,"reg-whiting-turner-lighthouse-campus"],["Gilbane","IAD07-08","2026-01-07",1,2,1,"reg-gilbane-iad07-iad08"],["Whiting-Turner","SDC BLACKFIN","2026-01-07",1,1,2,"reg-whiting-turner-sdc-blackfin"],["Black & Veatch","TECO Keene Branch","2026-01-09",1,1,1,"reg-black-and-veatch-teco-keene-branch"],["GCON","PHX07-13","2026-01-09",1,4,0,"reg-gcon-phx07-13 / #icomm-gcon-phx07-13"],["Clark","IAD 317 & 307","2026-01-12",1,1,1,"reg-clark-iad-307-and-317"],["Clune","CyrusOne Elwood CHI6","2026-01-12",1,1,1,"reg-cyrusone-elwood-chi6"],["Gray Construction","ATL 086","2026-01-12",1,1,1,"reg-gray-construction-atl-086"],["Holder","Mustang MNO Mass Grading","2026-01-12",1,1,1,"reg-holder-mustang-mno-mass-grading"],["Holder","Mustang MNO1","2026-01-12",1,1,1,"reg-holder-mustang-mno1"],["Whiting-Turner","IAD 214","2026-01-12",1,1,1,"reg-whiting-turner-iad-214"],["Whiting-Turner","Lighthouse WI12","2026-01-12",1,1,2,"reg-weitz-lighthouse-wi12"],["CRB Group","Astrazeneca Rockville","2026-01-14",0,0,1,""],["HITT","IAD 166 Campus","2026-01-14",1,1,1,"reg-hitt-iad-166-campus"],["National Geographic","Society - MOE","2026-01-15",0,0,1,""],["Black & Veatch","Delta","2026-01-16",0,0,1,""],["Clark","Walnut Creek Substation","2026-01-16",1,1,1,""],["DPR","Vantage-DPR-Campus","2026-01-16",1,1,0,"reg-dcompudynamics-dpr-hitt-tx-vantage-campus"],["HITT","QTS ATL2 DC6","2026-01-16",1,1,1,"reg-hitt-qts-atl2-dc6"],["DPR","Word of Grace","2026-01-19",1,1,1,"reg-dpr-word-of-grace"],["HITT","HEL Campus","2026-01-20",1,1,1,"reg-hitt-hel-campus"],["HITT","HEL02","2026-01-20",1,1,1,"reg-hitt-hel02"],["HITT","HEL04","2026-01-20",1,1,0,"reg-hitt-hel04"],["Layton","QTS SLC DC1","2026-01-20",1,1,1,"reg-layton-qts-slc1-dc1"],["CSC","Bezos Learning Center - Smithsonian","2026-01-22",1,1,1,"reg-csc-bezos-learning-center-smithsonian"],["HITT","ATL15 Fort Gillem","2026-01-22",1,1,1,"reg-hitt-atl15-fort-gillem"],["Clark","Cadillac F1","2026-01-23",1,1,1,"reg-clark-cadillac-f1"],["Clayco","CMH175 Campus","2026-01-26",1,1,1,"reg-clayco-cmh175-campus"],["HITT","Hitt-DC7","2026-01-26",1,1,1,"reg-hitt-qts-atl2-dc7"],["Holder","Project Icarus","2026-01-26",1,1,1,"reg-holder-project-icarus"],["Vantage Data Centers","Vantage Lighthouse Campus","2026-01-26",1,1,1,""],["Weitz","IAD 174","2026-01-26",1,2,4,"reg-weitz-iad-174"],["Whiting-Turner","IAD 196, 197, 198 Campus","2026-01-26",1,1,1,"reg-whiting-turner-iad-196-198-campus"],["Whiting-Turner","Manitou Colorado Springs","2026-01-26",1,1,1,"reg-whiting-turner-manitou-colorado-springs"],["Turner-McCarthy","Project Lighthouse WI14","2026-01-29",1,1,1,"reg-turner-mccarthy-lighthouse-wi14"],["Black & Veatch","OCI - Penton Solar","2026-01-30",1,1,2,"reg-black-and-veatch-penton-solar"],["Whiting-Turner","101 Foundations","2026-01-30",1,1,0,""],["Alston Construction Company","SIL5","2026-02-02",1,1,1,"reg-alston-construction-sil5"],["Clayco","Rivian SSN","2026-02-02",1,1,1,"reg-clayco-rivian-ssn"],["Clayco","STC Stafford","2026-02-02",1,1,1,"reg-clayco-stc-stafford"],["Gray Construction","CMH098","2026-02-02",1,1,1,"reg-gray-construction-cmh098"],["Clayco","CMH207-208 Campus","2026-02-04",1,1,1,"reg-clayco-cmh207-208"],["HITT","QTS RIC5 CIVIL","2026-02-04",1,1,1,"reg-hitt-qts-ric5-civil"],["Layton","Project Hawkeye West Campus","2026-02-05",1,3,0,"reg-layton-project-hawkeye-west-campus"],["Whiting-Turner","CCO-08","2026-02-05",1,1,0,"reg-whiting-turner-cco-08"],["HITT","IAD 168","2026-02-06",1,1,0,"reg-hitt-iad-168"],["HITT","Stack NVA06 Campus","2026-02-06",1,1,0,"reg-hitt-nva06-campus"],["Whiting-Turner","VA16","2026-02-06",1,1,1,"reg-whiting-turner-va16"],["Gilbane-Evans","QTS CLT1 Campus","2026-02-09",1,1,1,"reg-gilbane-evans-qts-clt1-campus"],["HITT","NVA06B","2026-02-09",1,1,0,"reg-hitt-nva06b"],["Primoris","55151 Lucy Solar","2026-02-09",1,1,3,"reg-primoris-services-corporation-55151-lucy-solar"],["Ryan Companies","DZU2/WNM7 Project Lola","2026-02-09",1,1,2,"reg-ryan-companies-dzu2-project-lola"],["HITT","Rocket 188594","2026-02-10",1,1,0,"reg-hitt-rocket-188594"],["Primoris","55161 Grape","2026-02-10",1,1,0,"reg-primoris-renewable-energy-55161-grape"],["Brasfield & Gorrie","AUB 1","2026-02-16",1,1,1,"reg-brasfield-and-gorrie-aub-1"],["Clayco","CLT17","2026-02-16",1,1,1,"reg-clayco-clt17"],["Coakley & Williams","Supreme Court of Maryland","2026-02-16",1,1,1,"reg-coakley-and-williams-supreme-court-of-maryland"],["Gray Construction","CVG400","2026-02-16",1,1,0,"reg-gray-construction-cvg400"],["Holder","PHX06-2","2026-02-16",1,1,1,"reg-holder-phx06-2"],["Manhattan Construction Group","SWR2A","2026-02-16",1,1,1,"reg-manhattan-construction-group-swr2a"],["Securitas","Buffalo IAD20","2026-02-16",1,1,0,"reg-securitas-buffalo-iad20"],["Bozzuto","LIFE TIME LIVING","2026-02-17",1,1,1,"reg-bozzuto-life-time-living"],["HITT","RIC22","2026-02-17",1,1,2,"reg-hitt-ric22"],["HITT","RIC23","2026-02-17",1,1,1,"reg-hitt-ric23"],["HITT","RIC24","2026-02-17",1,1,1,"reg-hitt-ric24"],["HITT","RIC25","2026-02-17",1,1,1,"reg-hitt-ric25"],["Jacobs","Riverbend Data","2026-02-17",1,1,1,"reg-jacobs-engineering-group-riverbend-data"],["Suffolk","IAD 045","2026-02-17",1,1,1,"reg-suffolk-iad-045"],["TeraWulf","Lake Mariner CB2","2026-02-17",1,1,1,"reg-terawulf-lake-mariner-data-center-cb-2"],["TeraWulf","Lake Mariner CB3","2026-02-17",1,1,1,"reg-terawulf-lake-mariner-data-center-cb3"],["Turner-McCarthy","Project Lighthouse WI13-WI14","2026-02-17",1,1,1,"reg-turner-mccarthy-project-lighthouse-wi13-wi14"],["Brasfield & Gorrie","QTS DC4","2026-02-18",1,1,1,"reg-brasfield-and-gorrie-qts-dc4"],["TeraWulf","Lake Mariner CB4","2026-02-18",1,1,1,"reg-terawulf-lake-mariner-data-center-cb4"],["The Conlan Company","Azalea","2026-02-19",1,1,1,"reg-the-conlan-company-azalea"],["Clayco","CHI 12","2026-02-20",1,1,1,"reg-clayco-chi-12"],["HITT","LCK062","2026-02-20",1,1,1,""],["ISP Group","CO","2026-02-20",1,1,1,"reg-isp-group-co"],["Whiting-Turner","TX-11 Fit Out","2026-02-20",1,1,1,"reg-whiting-turner-tx-11-fit-out"],["TeraWulf","Lake Mariner DC Campus","2026-02-23",1,2,4,"reg-terawulf-lake-mariner-data-center-campus"],["Alston Construction Company","C1 Building 1","2026-02-24",1,1,1,"reg-alston-construction-c1-building-1"],["Blue Rock Construction","PHL109 & PHL110 Campus","2026-02-24",1,1,1,"reg-blue-rock-construction-phl109-and-phl110-campus"],["Bozzuto","Residences at Table Talk Square","2026-02-24",1,1,1,"reg-bozzuto-residences-at-table-talk-square"],["HITT","QTS RIC3 DC4","2026-02-24",1,1,1,"reg-hitt-qts-ric3-dc4"],["Switch Inc","RNO 6","2026-02-24",1,1,1,"reg-switch-gray-construction-rno-6"],["Core Scientific","DNN1","2026-02-27",1,1,1,"reg-core-scientific-dnn1"],["Webber Waterworks","P6A","2026-02-27",1,1,1,"reg-webber-waterworks-p6a"],["Switch Inc","RNO Campus","2026-03-04",1,1,0,"reg-switch-rno-campus"],["Advantage Dirt Contractors","EATo5","2026-03-09",1,1,1,"reg-advantage-dirt-contractors-eat05"],["Barton Malow Company","IAD128","2026-03-10",1,2,1,"reg-barton-malow-company-iad128"],["Coakley & Williams","Anduril Industries - First and Second Floor","2026-03-10",0,0,1,""],["Coakley & Williams","Our Lady of Mercy School","2026-03-10",0,0,1,""],["Suffolk-Walbridge","SBN200-209 Campus","2026-03-10",1,3,3,"reg-suffolk-walbridge-sbn200-209-campus"],["Coakley & Williams","4800 Hampden Ln","2026-03-11",0,0,1,""],["Coakley & Williams","ATCC-HCF","2026-03-11",0,0,1,""],["Coakley & Williams","Anduril 451","2026-03-11",0,0,1,""],["Coakley & Williams","Beacon Hotel","2026-03-11",0,0,1,""],["Coakley & Williams","EVCON DLA Disposition Services","2026-03-11",0,0,1,""],["Coakley & Williams","Kennedy School","2026-03-11",0,0,1,""],["Coakley & Williams","Potomac Shores","2026-03-11",0,0,1,""],["Coakley & Williams","Savills Office Relocation","2026-03-11",0,0,1,""],["EE Reed","Stack IAD 286 Building 2","2026-03-11",0,0,1,""],["Trinity","RLF-GTO-Lump","2026-03-11",0,0,1,""],["Coakley & Williams","Anduril Industries","2026-03-12",0,0,1,""],["Coakley & Williams","Homeless Navigation Center","2026-03-12",0,0,1,""],["Coakley & Williams","St. Anselm","2026-03-12",0,0,1,""],["EE Reed","Stack IAD 285 Building 1","2026-03-12",0,0,1,""],["HITT","0500 Josh Jr","2026-03-12",0,0,1,""],["HITT","Project Zenith","2026-03-12",0,0,1,""],["HITT","Rowan-bauxite-1","2026-03-12",0,0,1,""],["HITT","YONDR","2026-03-12",0,0,1,""],["Turner","COSNER TECH CAMPUS","2026-03-12",1,4,9,"reg-turner-cosner-tech-campus"],["Coakley & Williams","Philomont Fire & Rescue","2026-03-13",0,0,1,""],["CSI","Jasmine","2026-03-17",1,1,2,"reg-csi-jasmine"],["Kokosing","Big Hollow Energy Center","2026-03-17",1,1,1,"reg-kokosing-big-hollow-energy-center"],["Coakley & Williams","Anduril Industries Campus","2026-03-18",0,0,1,""],["DPR","Abilene Data Center","2026-03-18",1,1,2,"reg-dpr-abilene-data-center"],["GCON","PHX 13 (GCON-Lewis)","2026-03-18",0,0,1,""],["Holder","Edgecore RNO","2026-03-19",0,0,1,""],["Coakley & Williams","Foxcroft STEAM","2026-03-20",0,0,1,""],["CSI","Aratina II","2026-03-23",1,1,1,"reg-csi-aratina-ii"],["CSI","JVR","2026-03-23",1,1,1,"reg-csi-jvr"],["CSI","Overnight","2026-03-23",1,1,1,"reg-csi-overnight"],["HITT","BSC SEP","2026-03-24",1,1,0,"reg-hitt-bsc-jv"],["FAB-UAG JV","Linden Plaza","2026-03-25",1,4,32,"reg-urban-atelier-group-linden-plaza"],["Securitas","Hawk RIC 25","2026-03-25",0,0,1,""],["Evans","QTS DEN1 DC2","2026-03-26",1,2,0,"reg-evans-qts-den1-dc2"],["Evans","QTS DEN1 DC3","2026-03-30",1,1,0,"reg-evans-qts-den1-dc3"],["Trinity Construction","MAF1","2026-03-30",1,1,1,""],["Clark","CLT10","2026-03-31",1,1,1,"reg-clark-clt10"],["McKinstry Company","BM-2 campus","2026-03-31",0,0,1,""],["HITT","IAD 313 TI","2026-04-01",0,0,1,""],["Securitas","Hawk DFW22 DC5","2026-04-01",1,1,0,"temporary-securitas-hawk-dfw22-dc5"],["Whiting-Turner","Houston Toyota Center Renovation","2026-04-02",1,3,4,""],["HITT","IAD 180","2026-04-03",0,0,2,""],["HITT","IAD 59","2026-04-03",0,0,1,""],["HITT","TI FITOUT IAD 531","2026-04-03",0,0,1,""],["Sitemetric","Nova Distribution","2026-04-03",1,1,1,"new-site-launch (likely)"],["Skanska","ALL SKANSKA JOBSITES","2026-04-03",1,1,0,"reg-skanska-msft-fty01 (posted there)"],["Caddell Construction","CMH170 / CMH170-4108","2026-04-06",1,6,3,""],["Clark","MNZ-03","2026-04-06",0,0,1,""],["GCON","GCON 07","2026-04-06",0,0,1,""],["Suffolk","PHL-100-104","2026-04-06",1,1,0,"reg-suffolk-phl100-105-campus"],["Switch Inc","RNO 4","2026-04-06",1,1,1,"reg-switch-gray-construction-rno-4"],["Whiting-Turner","PROJECT SCISSORTAIL","2026-04-06",1,3,0,""],["Bozzuto","Belmont Crossing Phase 2 2C-2D","2026-04-07",0,0,1,""],["Coakley & Williams","Ft Davis Recreational Center","2026-04-07",0,0,1,""],["Microsoft","MNZ27","2026-04-07",0,0,2,""],["Whiting-Turner","MUS1A","2026-04-07",1,4,0,"icomm-whiting-turner-mus1a"],["Ryan Companies","LBB-01","2026-04-08",1,1,1,"reg-ryan-companies-lbb-01"],["HITT","CDR East Campus","2026-04-09",0,0,1,""],["HITT","CDR East DC6","2026-04-09",0,0,1,""],["Clack","IMDC RCH1","2026-04-14",0,0,1,""],["Hourigan","QTS RIC26","2026-04-14",1,1,0,"reg-hourigan-qts-ric26"],["Alston Construction Company","SWI2","2026-04-15",0,0,1,""],["Whiting-Turner","ESL Oxford Hills","2026-04-17",0,0,1,""],["Suffolk-HITT-LFDriscoll","QTS Iowa East Campus (IA72763868)","2026-04-20",0,0,2,""],["HITT","QTS CDR-West-Campus","2026-04-21",1,1,0,"reg-hitt-qts-cdr-west-campus"],["ISP Group","IN","2026-04-23",0,0,1,""],["Black & Veatch","OCI - Vistra Spectrum","2026-04-27",0,0,2,""],["Holder","TPA","2026-04-27",0,0,1,""],["Black & Veatch","Bowen","2026-04-28",0,0,1,""],["Black & Veatch","OCI - Crusoe Goodnight","2026-04-28",0,0,1,""],["Brasfield & Gorrie","QTS ATL02 - East Campus Sitework","2026-04-28",0,0,1,""],["Suffolk","QTS Iowa DC7","2026-04-28",0,0,1,""],["Switch Inc","Sundt AWTF","2026-04-28",1,2,3,"icomm-sundt-awtf-switch"],["YATES","RSE","2026-04-28",1,1,0,"reg-yates-rse"],["HITT","CDR East DC4","2026-05-04",0,0,1,""],["HITT","CDR East DC5","2026-05-04",0,0,1,""],["Layton-Weitz-Hitt","QTS Iowa West Campus","2026-05-04",0,0,1,""],["Rogers-O'Brien","QTS DFW2 DC5","2026-05-05",1,1,1,""],["The Conlan Company","FTY3","2026-05-06",0,0,1,""],["Whiting-Turner","SGR HUB","2026-05-06",1,1,0,""],["Holder","NTT VA10","2026-05-07",1,1,0,""],["Suffolk","Bauxite II","2026-05-07",0,0,3,""],["Clayco","SBN750","2026-05-11",1,1,1,""],["Nox Group","RMCI-Project Rodeo","2026-05-12",1,1,2,""],["Clark","RNO1 Peru Ridge","2026-05-13",0,0,1,""],["Gray Construction","PDX 187","2026-05-13",0,0,1,""],["Gray Construction","PDX 188","2026-05-13",0,0,1,""],["HITT","DFW23","2026-05-13",0,0,1,""],["HITT","QTS DFW21","2026-05-13",0,0,1,""],["Structure Tone","Hutto3","2026-05-13",0,0,1,""],["Whiting-Turner","QTS MAN1 DC6","2026-05-14",0,0,1,""],["Whiting-Turner","Sams Club Visalia","2026-05-14",0,0,2,""],["Core Scientific","MSK1","2026-05-15",0,0,2,""],["Securitas","Hawk RIC26","2026-05-15",0,0,1,""],["Bozzuto","Belmont Crossing Phase 2","2026-05-18",0,0,1,""],["HITT","GCDC","2026-05-18",0,0,1,""],["Gray Construction","JAN100-103","2026-05-20",1,1,2,"reg-gray-construction-jan100-103"],["CPPJV","SAS2","2026-05-21",1,1,1,"icomm-sas2-cppjv"],["HITT","COL-1","2026-05-21",0,0,1,""],["Black & Veatch","OCI - Brewster Solar","2026-05-22",1,1,2,"icomm-brewster-solar-black-and-veatch"],["Black & Veatch","OCI - Mattaniah Solar","2026-05-22",1,1,1,"icomm-mattaniah-solar-black-and-veatch"],["Clayco","AWS SBN100-102 New carlisle IN","2026-05-22",0,0,1,""],["DPR","SWSC","2026-05-22",0,0,1,""],["Clark","RNO20 South Valley","2026-05-26",0,0,1,""],["Arco","Stream Houston","2026-05-28",0,0,1,""],["HITT","IAD170","2026-05-28",0,0,3,""],["Suffolk","QTS Iowa East Campus","2026-06-01",0,0,10,""],["Black & Veatch","OCI - Acres AEP","2026-06-02",0,0,1,""],["Black & Veatch","OCI - DFW 2 DAS","2026-06-02",1,1,1,"icomm-dfw-2-das-black-and-veatch"],["Black & Veatch","OCI - Rowan Cinco","2026-06-02",0,0,1,""],["DPR","Digital Drive","2026-06-02",0,0,1,""],["Mortenson","Chicago Data Center","2026-06-02",0,0,1,""],["Pepper","SBN 520 (Hobart IN)","2026-06-02",1,1,3,""],["Alberici Constructors","Burlington RICE Power Plant","2026-06-03",0,0,2,""],["Layton","Mila","2026-06-03",0,0,1,""],["Black & Veatch","OCI - Andes Mantero Entergy","2026-06-04",0,0,1,""],["Black & Veatch","OCI - Duke Allen II","2026-06-04",0,0,2,""],["Black & Veatch","OCI - Galet Go","2026-06-04",0,0,2,""],["Black & Veatch","OCI - Macaw","2026-06-04",0,0,2,""],["DPR","DC21","2026-06-04",0,0,1,""],["Black & Veatch","OCI - AEP DACR","2026-06-05",0,0,1,""],["Black & Veatch","OCI - Mantero Entergy","2026-06-05",0,0,1,""],["Clark","Bank of America Stadium ERP1","2026-06-05",1,7,6,"icomm-bank-of-america-stadium-erp1-clark"],["Evans","Scout Supplier Park","2026-06-05",0,0,1,""],["Black & Veatch","OCI - Asheville","2026-06-08",0,0,1,""],["Black & Veatch","OCI - Duke Craggy","2026-06-08",0,0,1,""],["Black & Veatch","OCI - Palmetto QTS","2026-06-08",0,0,1,""],["Coakley & Williams","Tourmaline 1401 H Street","2026-06-08",0,0,1,""],["Gray Construction","JAN112-113","2026-06-09",1,2,0,"reg-gray-construction-jan100-103 (posted there)"],["Messer","ELI LILLY LP2","2026-06-09",0,0,1,""],["Securitas","ATL22","2026-06-10",0,0,2,""],["CW Driver","Long Beach Poly High School","2026-06-11",0,0,4,""],["Suffolk","QTS Iowa DC4","2026-06-11",1,1,0,"reg-suffolk-qts-iowa-dc4"],["Suffolk","QTS Iowa DC5","2026-06-11",1,1,0,"reg-suffolk-qts-iowa-dc5"],["Securitas","ATL22-ATL23 Campus","2026-06-16",0,0,1,""],["Black & Veatch","OCI - Churchill Substation Entergy","2026-06-17",0,0,1,""],["Pike Construction Services","Walmart Mankato","2026-06-17",1,1,1,""],["Clune","ORD22","2026-06-22",0,0,1,""],["Securitas","ATL-24","2026-06-22",0,0,1,""],["Skanska","ATL06","2026-06-22",1,3,0,"icomm-skanska-atl06"],["HITT","IAH 100","2026-06-23",0,0,1,""],["Securitas","Zeus DFW29","2026-06-23",0,0,1,""],["HITT","WENATCHEE EAT04-05 CAMPUS","2026-06-25",1,1,0,"reg-hitt-wenatchee-eat-campus"],["Holder","PHX02A Skyway","2026-06-25",0,0,1,""],["Arco","IND101","2026-06-26",1,1,1,""],["Walbridge","SBN210 Campus","2026-06-26",0,0,1,""],["Securitas","IAD 28","2026-06-29",0,0,1,""],["Holder","RNO2","2026-06-30",0,0,1,""],["Whiting-Turner","IAD619","2026-06-30",0,0,1,""],["Clack","IAH Terminal B","2026-07-01",0,0,1,""],["Hensel Phelps","EAT 12","2026-07-06",0,0,1,""],["Ryan Companies","ATL Covington","2026-07-08",0,0,2,""],["Turner","Bauxite III","2026-07-09",0,0,1,""],["DPR","Powerhouse","2026-07-13",1,1,5,"icomm-powerhouse-dpr-construction"],["Whiting-Turner","Dublin Health","2026-07-13",1,2,1,""],["Cadence","GA10","2026-07-21",0,0,1,""],["Holder","PIT01","2026-07-21",0,0,1,""],["Pike Construction Services","Walmart Mebane NC","2026-07-22",1,2,0,""],["Dynamic Group","Beacon Point","2026-07-23",0,0,1,""],["Evans","QTS DEN1 Campus (DC1-DC3)","2026-07-27",1,4,3,""],["Holder","CloudHQ ORD","2026-07-27",0,0,1,""],["TeraWulf","Raylan Data","2026-07-27",0,0,2,""],["Davis","BCPS BCC","2026-08-03",0,0,1,""],["UNKNOWN","Site TX85915774 (\"25 - Faceplate\")","2026-08-03",0,0,1,""],["Lee Lewis Construction","Floydada Data Center","2026-08-04",0,0,1,""],["Bozzuto","Providence Town Center 3","2026-08-06",0,0,1,""],["HITT","PHL101","2026-08-10",1,1,2,"icomm-phl101-hitt-contracting"],["Ryan Companies","Mae CLS1","2026-08-10",0,0,2,""],["Blue Rock Construction","PHL 102","2026-08-11",1,1,0,""],["Ryan Companies","Dominio","2026-08-11",0,0,2,""],["Coakley & Williams","St. Peter School","2026-08-12",0,0,1,""],["Ryan Companies","PHX066","2026-08-12",0,0,1,""],["Switch Inc","Switch Keep 2.0 Building 9","2026-08-12",0,0,2,""],["The Conlan Company","Hummingbird","2026-08-13",0,0,1,""],["Clune","Grayslake Project Lincoln","2026-08-17",0,0,2,""],["GCON","PHX14","2026-08-17",0,0,1,""],["Ryan Companies","MIV1 Diehard","2026-08-17",0,0,13,""],["HITT","AMZ 23 IAD 192","2026-08-18",0,0,1,""],["Clune","DFW10","2026-08-20",0,0,1,""],["Ryan Companies","DKE3","2026-08-20",0,0,1,""],["Hill Construction","Residential Home","2026-08-24",0,0,1,"icomm-hill-construction-company-residential-home"],["Securitas","SAT24","2026-08-24",1,1,0,""],["Turner-Russell","ATL CCO-06","2026-08-31",0,0,1,""],["Black & Veatch","OCI - Penton GT Grid","2026-09-02",0,0,2,""],["Ryan Companies","SBN 500","2026-09-02",0,0,1,"icomm-sbn-500-ryan-companies"],["Evans","Core Scientific MSK1","2026-09-04",0,0,1,""],["Securitas","Journey IAD26","2026-09-04",0,0,1,""],["Clayco","NTT-PH6","2026-09-08",0,0,1,""],["Gilbane","CMH229","2026-09-08",0,0,1,""],["Ryan Companies","Caterpillar HQ Remodel","2026-09-08",0,0,1,""],["Evans","Southwire","2026-09-09",0,0,1,""],["Suffolk","IAD536 TI","2026-09-09",0,0,1,""],["Brinkmann Constructors","Project Green","2026-09-10",0,0,2,""],["HITT","Logos","2026-09-10",0,0,1,""],["Suffolk","IAD534 TI","2026-09-10",0,0,2,""],["Suffolk","IAD535 TI","2026-09-10",0,0,1,""],["Suffolk","IAD537 TI","2026-09-10",0,0,1,""],["Evans","DNN5","2026-09-14",0,0,1,""],["Suffolk","IAD 534-537 TI Fitout","2026-09-15",1,1,1,"icomm-suffolk-iad-534-537-ti-fitout-campus"],["Evans","TA Ellenwood Data Center","2026-09-16",0,0,3,""],["Clune","UNKNOWN (Clune - Faceplate 1/2, 2026-09-21)","2026-09-21",1,3,0,""],["Holder","LAN01","2026-09-22",0,0,1,""],["Turner","IAD04-06","2026-09-22",1,1,0,"reg-turner-iad04-iad06-off-site-parking-lot (likely)"],["Securitas","CHI29","2026-09-25",0,0,1,""],["Gilbane","CMH232","2026-09-30",0,0,2,""],["Black & Veatch","OCI - AEP Vision","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Alexandria St Retail","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Baxter Wilson","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Entergy Costas County","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Entergy Green Acres","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Formosa","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Goldfinch Solar","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Segno Solar","2026-10-05",0,0,1,""],["Black & Veatch","OCI - Stillman Station SSVT","2026-10-05",0,0,1,""],["Black & Veatch","OCI - W. McAllen","2026-10-05",0,0,1,""],["DPR","CTP Campus","2026-10-05",0,0,1,""],["Clark","IAD 550","2026-10-08",0,0,1,""],["The Beck Group","QTS - DEN1","2026-10-08",0,0,1,""],["HITT","IAD 613 Ski Lodge","2026-10-09",0,0,1,""],["Hourigan","CLT1","2026-10-09",0,0,1,""],["The Conlan Company","FME1","2026-10-09",0,0,1,""],["Walbridge","CMH243","2026-10-09",0,0,1,""]],"P":[["2026-04-21","/careers","Careers"],["2026-04-24","/solutions/ai-camera","Sitemetric AI Camera"],["2026-04-29","/about-us","About Us"],["2026-04-29","/case-study/data-center","Data Center Customer Story"],["2026-05-19","/leadership","Leadership"],["2026-06-04","/industries/data-center-construction","Data Center Construction"],["2026-06-10","/case-study/case-studies-healthcare-construction-workforce-credentialing","Healthcare Customer Story"],["2026-06-11","/case-study/case-studies-energy-construction-site-access-control","Energy Customer Story"],["2026-06-15","/solutions/sitemetric-ai","Sitemetric AI"],["2026-06-30","/industries/power-generation","Power Generation Construction Access Control & Workforce Monitoring | Sitemetric"],["2026-07-01","/industries/government","Government & Public Infrastructure Construction Access Control & Workforce Management"],["2026-07-01","/industries/healthcare","Healthcare Construction Management"],["2026-07-09","/case-study/case-studies-public-infrastructure-construction-access-control","Government Customer Story"],["2026-07-13","/insights/construction-didnt-miss-the-iot-revolution-its-about-to-lead-it","Construction Didn't Miss the IoT Revolution. It's About to Lead It"],["2026-07-13","/insights/from-trailer-to-product-team","From the Trailer to the Product Team: Why I Left the Field to Build Construction Technology"],["2026-07-15","/case-study/case-studies-multifamily-construction-workforce-visibility","Multifamily Customer Story"],["2026-07-15","/industries/multifamily-construction","Multifamily Construction"],["2026-07-21","/general-contractors","General Contractors"],["2026-07-23","/owners","Owners"],["2026-08-04","/zone-intelligence","Heat Map"],["2026-08-13","/case-study/airport-construction","Airport Construction Case Study"],["2026-08-13","/case-study/public-school-construction","Education Customer Story"],["2026-08-13","/industries/civil-infrastructure-construction","Civil & Infrastructure Construction"],["2026-08-13","/industries/education-construction","Education Construction"],["2026-08-17","/solutions/safety","Safety"],["2026-08-22","/insights/construction-site-security-has-an-alert-fatigue-problem","Construction Site Security Has An Alert Fatigue Problem"],["2026-08-22","/insights/construction-site-security-in-the-age-of-ai","Construction Site Security in the Age of AI"],["2026-08-22","/insights/data-is-a-trade-in-construction","Data Is a Trade Within Construction. It's Time We Treated It Like One"],["2026-08-31","/resources/construction-site-badging","Construction Site Badging: A Complete Guide"],["2026-09-01","/resources/construction-site-access-control","Construction Site Access Control: What It Is and How It Works"],["2026-09-01","/resources/construction-site-security","Construction Site Security: A Practical Guide"],["2026-09-01","/resources/construction-turnstiles-badge-readers","Construction Turnstiles and Badge Readers: A Practical Guide"],["2026-09-01","/resources/construction-workforce-management","Construction Workforce Management: A Guide to Workforce Visibility"],["2026-09-01","/resources/remote-video-monitoring-construction","Remote Video Monitoring for Construction Sites"],["2026-09-03","/resources","Resources"],["2026-09-10","/resources/construction-access-control-booths","Access Control Booths on Construction Sites"],["2026-09-10","/resources/construction-site-cameras","Construction Site Cameras: A Buyer's Guide"],["2026-09-10","/resources/construction-site-monitoring","Construction Site AI Monitoring"],["2026-09-11","/resources/ai-ppe-detection-construction","How AI PPE Detection Works on Construction Sites"],["2026-09-11","/resources/construction-emergency-mustering","Emergency Mustering and Evacuation on Construction Sites"],["2026-09-11","/resources/construction-site-theft-prevention","Construction Site Theft Prevention"],["2026-09-11","/resources/construction-worker-onboarding","Construction Worker Onboarding and Orientation"],["2026-09-15","/solutions/field-support","Field Support"],["2026-09-17","/solutions/access-control","Access Control"],["2026-09-19","/solutions/mass-texting","Mass Texting"],["2026-09-30","/solutions/advanced-security","Advanced Security"],["2026-10-06","/contact-us-2","Contact Us 2"],["2026-10-06","/solutions/badges-2","Badges 2"]]}; // B: [company, project, date, designed, pngFiles, zipFiles, channel]; P: [created, path, title]
+const SITE="https://www.sitemetric.com";
+const MON=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+const MONL=["January","February","March","April","May","June","July","August","September","October","November","December"];
+const ml=k=>MON[+k.slice(5)-1]+" ’"+k.slice(2,4);
+const mlong=k=>MONL[+k.slice(5)-1]+" "+k.slice(0,4);
+const fmt=d=>MON[+d.slice(5,7)-1]+" "+(+d.slice(8,10));
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const css=v=>getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const reduce=matchMedia("(prefers-reduced-motion:reduce)").matches;
+const MONTHS=[];for(let y=2025,m=10;!(y===2026&&m>10);m++){if(m>12){m=1;y++}MONTHS.push(`${y}-${String(m).padStart(2,"0")}`)}
+const isArt=p=>/^\/(insights|resources)\//.test(p[1]);
+const SITEP=P.filter(p=>!isArt(p)), ARTS=P.filter(isArt);
+const byM=k=>B.filter(b=>b[2].startsWith(k));
+const tip=document.getElementById("tip");
+function showTip(html,x,y){tip.innerHTML=html;tip.style.opacity=1;const w=tip.offsetWidth,h=tip.offsetHeight;tip.style.left=Math.min(innerWidth-w-8,Math.max(8,x-w/2))+"px";tip.style.top=(y-h-14<8?y+18:y-h-14)+"px"}
+const hideTip=()=>tip.style.opacity=0;addEventListener("scroll",hideTip,{passive:true});
+
+const CO={};B.forEach(b=>{const c=CO[b[0]]??={n:b[0],d:0,m:0,list:[],first:b[2]};b[3]?c.d++:c.m++;c.list.push(b)});
+const COS=Object.values(CO).sort((a,b)=>(b.d+b.m)-(a.d+a.m)||a.n.localeCompare(b.n));
+const pngTotal=B.reduce((s,b)=>s+b[4],0), zipTotal=B.reduce((s,b)=>s+b[5],0);
+
+/* poster decorations */
+document.getElementById("texture").innerHTML=B.map((b,i)=>`<i class="${b[3]?"d":""}" style="animation-delay:${reduce?0:Math.round(i*3)}ms"></i>`).join("");
+document.getElementById("topco").innerHTML=COS.slice(0,5).map(c=>`<li>${esc(c.n)}<span>${c.d+c.m}</span></li>`).join("");
+document.getElementById("pstack").innerHTML=SITEP.map((p,i)=>`<i style="width:${30+((i*37)%50)}px"></i>`).slice(0,14).join("");
+document.getElementById("astack").innerHTML=ARTS.map((p,i)=>`<i style="width:${40+((i*29)%60)}px"></i>`).slice(0,14).join("");
+
+/* count-up */
+if(!reduce){
+  document.querySelectorAll("[data-count]").forEach(el=>{
+    const end=+el.dataset.count,pre=el.dataset.prefix||"",t0=performance.now(),dur=1300;
+    const step=t=>{const k=Math.min(1,(t-t0)/dur),e=1-Math.pow(1-k,3);el.textContent=pre+Math.round(end*e);if(k<1)requestAnimationFrame(step)};
+    requestAnimationFrame(step);
+  });
+}
+
+/* year chart: one axis (job sites); pages + articles drawn as stacked squares beneath the axis */
+let selMonth=null;
+function drawYear(){
+  const W=1100,L=34,R=8,T=26,CH=220,PG=130,H=T+CH+30+PG,n=MONTHS.length,bw=(W-L-R)/n;
+  const data=MONTHS.map(k=>{const l=byM(k);return{d:l.filter(b=>b[3]).length,m:l.filter(b=>!b[3]).length,p:SITEP.filter(x=>x[0].startsWith(k)).length,a:ARTS.filter(x=>x[0].startsWith(k)).length}});
+  const ymax=80,y=v=>T+CH*(1-v/ymax),base=y(0);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Job sites per month as stacked bars, peaking at 72 in December 2025; web pages and articles per month as squares below, peaking at 17 in September 2026.">`;
+  [0,20,40,60,80].forEach(v=>s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${css('--rule')}"/><text x="${L-8}" y="${y(v)+4}" text-anchor="end">${v}</text>`);
+  s+=`<text x="${L}" y="${T-12}">JOB SITES</text><text x="${L}" y="${base+52}">PAGES</text>`;
+  data.forEach((d,i)=>{
+    const x0=L+i*bw,x=x0+bw*.16,w=bw*.68,t=d.d+d.m,delay=reduce?0:200+i*70;
+    s+=`<g class="col${selMonth===i?" sel":""}" data-i="${i}" tabindex="0" role="button" aria-label="${mlong(MONTHS[i])}: ${t} job sites, ${d.p+d.a} pages">`;
+    s+=`<rect class="hl" x="${x0+1}" y="${T-6}" width="${bw-2}" height="${H-T+6}" fill="transparent"/>`;
+    if(d.d) s+=`<rect class="grow" style="animation-delay:${delay}ms" x="${x}" y="${y(d.d)}" width="${w}" height="${base-y(d.d)}" fill="${css('--red-ui')}"/>`;
+    if(d.m){const yt=y(t),yb=d.d?y(d.d)-2:base;s+=`<path class="grow" style="animation-delay:${delay+120}ms" d="M${x},${yb} V${yt+4} Q${x},${yt} ${x+4},${yt} H${x+w-4} Q${x+w},${yt} ${x+w},${yt+4} V${yb} Z" fill="${css('--blue-ui')}"/>`}
+    if(t) s+=`<text class="val" x="${x+w/2}" y="${y(t)-7}" text-anchor="middle">${t}</text>`;
+    s+=`<text class="mo" x="${x+w/2}" y="${base+20}" text-anchor="middle">${MON[+MONTHS[i].slice(5)-1]}</text>`;
+    // page squares: 4 per row, filling downward
+    const sq=9,g=3,cols=4,sx=x+w/2-(cols*sq+(cols-1)*g)/2;let k=0;
+    const put=c=>{const r=Math.floor(k/cols),cc=k%cols;s+=`<rect x="${sx+cc*(sq+g)}" y="${base+34+r*(sq+g)}" width="${sq}" height="${sq}" rx="1.5" fill="${c}"/>`;k++};
+    for(let j=0;j<d.p;j++)put(css('--yellow'));for(let j=0;j<d.a;j++)put(css('--paper'));
+    s+=`</g>`;
+  });
+  s+=`<text x="${L}" y="${H-4}">’25</text><text x="${W-R}" y="${H-4}" text-anchor="end">’26</text></svg>`;
+  const box=document.getElementById("yearchart");box.innerHTML=s;
+  box.querySelectorAll(".col").forEach(g=>{const i=+g.dataset.i,d=data[i];
+    g.addEventListener("pointermove",e=>showTip(`<b>${mlong(MONTHS[i])}</b>${d.d} sites designed · ${d.m} automated<br>${d.p} web pages · ${d.a} insights/guides`,e.clientX,e.clientY));
+    g.addEventListener("pointerleave",hideTip);
+    const pick=()=>{selMonth=i;box.querySelectorAll(".col").forEach(c=>c.classList.toggle("sel",+c.dataset.i===i));openDrawer("month",i)};
+    g.addEventListener("click",pick);g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();pick()}});
+  });
+}
+drawYear();
+
+/* drawer */
+const slot=document.getElementById("drawerslot");let openKey=null;
+const ACCENT={sites:"--red",companies:"--ink",files:"--blue",pages:"--yellow",articles:"--paper",month:"--red"};
+function openDrawer(id,arg){
+  const key=id+(arg??"");
+  document.querySelectorAll(".blk").forEach(b=>b.setAttribute("aria-expanded",b.dataset.id===id?"true":"false"));
+  if(openKey===key){openKey=null;slot.innerHTML="";document.querySelectorAll(".blk").forEach(b=>b.setAttribute("aria-expanded","false"));if(id==="month"){selMonth=null;document.querySelectorAll(".yearchart .col").forEach(c=>c.classList.remove("sel"))}return}
+  openKey=key;if(id!=="month"){selMonth=null;document.querySelectorAll(".yearchart .col").forEach(c=>c.classList.remove("sel"))}
+  slot.innerHTML="";const d=document.createElement("section");d.className="drawer";d.style.setProperty("--k",`var(${ACCENT[id]})`);d.setAttribute("aria-live","polite");
+  slot.appendChild(d);RENDER[id](d,arg);
+  requestAnimationFrame(()=>d.scrollIntoView({behavior:reduce?"auto":"smooth",block:"start"}));
+}
+function closeDrawer(){openKey=null;slot.innerHTML="";selMonth=null;document.querySelectorAll(".blk").forEach(b=>b.setAttribute("aria-expanded","false"));document.querySelectorAll(".yearchart .col").forEach(c=>c.classList.remove("sel"));document.getElementById("poster").scrollIntoView({behavior:reduce?"auto":"smooth"})}
+document.querySelectorAll(".blk").forEach(b=>b.addEventListener("click",()=>openDrawer(b.dataset.id)));
+const head=(title,text)=>`<div class="phead"><div><h2>${title}</h2><p>${text}</p></div><button type="button" class="close" onclick="closeDrawer()">Close ↑</button></div>`;
+
+function monthBars(el,data,{colors,onPick,selected,tipFn,label}){
+  const W=640,H=200,L=28,R=4,T=18,Bm=26,n=data.length,bw=(W-L-R)/n;
+  const max=Math.max(...data.map(d=>d.reduce((a,b)=>a+b,0)),1);const step=max>60?20:max>20?10:max>8?4:2;const ymax=Math.ceil(max/step)*step;
+  const y=v=>T+(H-T-Bm)*(1-v/ymax);
+  let s=`<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="${esc(label)}">`;
+  for(let v=0;v<=ymax;v+=step)s+=`<line x1="${L}" x2="${W-R}" y1="${y(v)}" y2="${y(v)}" stroke="${css('--rule')}"/><text x="${L-6}" y="${y(v)+4}" text-anchor="end">${v}</text>`;
+  data.forEach((d,i)=>{
+    const x0=L+i*bw,x=x0+bw*.2,w=bw*.6;let acc=0;
+    s+=`<g class="hit${selected===i?" sel":""}" data-i="${i}" tabindex="0" role="button" aria-label="${ml(MONTHS[i])}"><rect class="bg" x="${x0+1}" y="${T-12}" width="${bw-2}" height="${H-T-Bm+12}" fill="transparent"/>`;
+    d.forEach((v,j)=>{if(!v)return;const yt=y(acc+v),yb=y(acc)-(acc?2:0);const isTop=d.slice(j+1).every(z=>!z);
+      s+=isTop?`<path d="M${x},${yb} V${yt+3} Q${x},${yt} ${x+3},${yt} H${x+w-3} Q${x+w},${yt} ${x+w},${yt+3} V${yb} Z" fill="${colors[j]}"/>`:`<rect x="${x}" y="${yt}" width="${w}" height="${Math.max(0,yb-yt)}" fill="${colors[j]}"/>`;acc+=v});
+    const t=d.reduce((a,b)=>a+b,0);if(t)s+=`<text class="val" x="${x+w/2}" y="${y(t)-5}" text-anchor="middle">${t}</text>`;
+    s+=`<text class="m" x="${x+w/2}" y="${H-9}" text-anchor="middle">${MON[+MONTHS[i].slice(5)-1]}</text></g>`;
+  });
+  el.innerHTML=s+"</svg>";
+  el.querySelectorAll(".hit").forEach(g=>{const i=+g.dataset.i;
+    g.addEventListener("pointermove",e=>showTip(tipFn(i),e.clientX,e.clientY));g.addEventListener("pointerleave",hideTip);
+    g.addEventListener("click",()=>onPick(i));g.addEventListener("keydown",e=>{if(e.key==="Enter"||e.key===" "){e.preventDefault();onPick(i)}})});
+}
+const rowHTML=b=>`<div class="row"><span class="dot" style="background:var(${b[3]?"--red-ui":"--blue-ui"})"></span><span class="t">${esc(b[0])} · ${esc(b[1])}<span>${b[6]?"#"+esc(b[6]):b[3]?"posted in DMs":"#automated-badge-printing"}</span></span><span class="r">${fmt(b[2])}</span></div>`;
+const kind=x=>/^\/(insights|resources)\//.test(x)?"ins":x.startsWith("/solutions")?"sol":x.startsWith("/industries")?"ind":x.startsWith("/case-study")?"cs":"oth";
+const cleanT=t=>t.replace(/ \| Sitemetric$/,"").replace(/ Construction Access Control.*$/," Construction");
+const pgLink=x=>`<a class="pg ${kind(x[1])}" data-k="${kind(x[1])}" href="${SITE+x[1]}" target="_blank" rel="noopener">${esc(cleanT(x[2]))}</a>`;
+
+const RENDER={
+ sites(p){
+  let filter="all",sel=MONTHS.indexOf("2025-12");
+  p.innerHTML=head(`${B.length} job sites`,`Red sites I designed and posted to the site's channel. Blue sites went into automated badge printing; many of those from Dec to Mar were older templates I moved into the system. Pick a month to see its sites.`)+
+   `<div class="chips" role="group" aria-label="Filter job sites">
+     <button type="button" class="chip" data-f="all" aria-pressed="true">All · ${B.length}</button>
+     <button type="button" class="chip" data-f="d" aria-pressed="false"><i style="background:var(--red-ui)"></i>Designed and posted · ${B.filter(b=>b[3]).length}</button>
+     <button type="button" class="chip" data-f="m" aria-pressed="false"><i style="background:var(--blue-ui)"></i>Automated printing · ${B.filter(b=>!b[3]).length}</button></div>
+   <div class="split"><div class="bars" id="sbars"></div><div id="sdetail"></div></div>`;
+  const keep=b=>filter==="all"||(filter==="d"?b[3]:!b[3]);
+  function draw(){
+   const data=MONTHS.map(k=>{const l=byM(k).filter(keep);return[l.filter(b=>b[3]).length,l.filter(b=>!b[3]).length]});
+   monthBars(p.querySelector("#sbars"),data,{colors:[css("--red-ui"),css("--blue-ui")],selected:sel,label:"New job sites per month",
+     tipFn:i=>`<b>${ml(MONTHS[i])}</b>${data[i][0]} designed · ${data[i][1]} automated`,onPick:i=>{sel=i;draw()}});
+   const list=byM(MONTHS[sel]).filter(keep);
+   const top=Object.entries(list.reduce((a,b)=>(a[b[0]]=(a[b[0]]||0)+1,a),{})).sort((a,b)=>b[1]-a[1]).slice(0,3).map(([n,c])=>`${esc(n)} ${c}`).join(" · ");
+   p.querySelector("#sdetail").innerHTML=`<div class="mtitle"><h3>${mlong(MONTHS[sel])}</h3><span class="eyebrow">${list.length} sites</span></div>
+     <div class="eyebrow" style="margin-bottom:10px;text-transform:none;letter-spacing:0">${top?"Most: "+top:"No sites in this view."}</div>
+     <div class="tiles" style="margin-bottom:12px">${list.map(b=>`<span class="tile ${b[3]?"d":"m"}" title="${esc(b[0]+" – "+b[1])}"></span>`).join("")}</div>
+     <div class="list">${list.map(rowHTML).join("")}</div>`;
+  }
+  p.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{filter=c.dataset.f;p.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===c));draw()});
+  draw();
+ },
+ files(p){
+  const all=pngTotal+zipTotal;
+  const top=[...B].sort((a,b)=>(b[4]+b[5])-(a[4]+a[5])).slice(0,10);const max=top[0][4]+top[0][5];
+  p.innerHTML=head(`~${Math.round(all/5)*5} faceplate files`,`Each job site can need several faceplates: color versions, light and dark backgrounds, and re-uploads when a site changes. ZIP counts include repeat uploads of the same file.`)+
+   `<div class="split-total" role="img" aria-label="${pngTotal} PNGs posted and ${zipTotal} files inside ZIPs"><div style="flex:${pngTotal};background:var(--red)">${pngTotal} PNGs posted</div><div style="flex:${zipTotal};background:var(--blue)">${zipTotal} in ZIPs</div></div>
+    <div class="split">
+     <div><div class="mtitle"><h3>Most files for one site</h3></div>
+      ${top.map(b=>`<div class="hbar"><span class="n">${esc(b[1])} <small>${esc(b[0])}</small></span><span class="cbar">${b[4]?`<span class="d" style="width:${b[4]/max*100}%"></span>`:""}${b[5]?`<span class="m" style="width:${b[5]/max*100}%"></span>`:""}</span><span class="num" style="font-family:var(--mono);font-size:12px;text-align:right">${b[4]+b[5]}</span></div>`).join("")}</div>
+     <div><div class="mtitle"><h3>By the numbers</h3></div>
+      <div class="kv">
+       <div style="--k:var(--red-ui)"><b class="num">${pngTotal}</b><span>faceplate PNGs posted to site channels and DMs</span></div>
+       <div style="--k:var(--blue-ui)"><b class="num">${zipTotal}</b><span>faceplates inside ZIPs for automated printing</span></div>
+       <div><b class="num">467</b><span>ZIP uploads to #automated-badge-printing</span></div>
+       <div><b class="num">${(all/B.length).toFixed(1)}</b><span>files per job site on average</span></div>
+      </div></div></div>`;
+ },
+ companies(p){
+  const max=COS[0].d+COS[0].m;
+  p.innerHTML=head(`${COS.length} companies`,`Every contractor and owner with at least one job site badged. Search, or open a company to see its sites.`)+
+   `<label class="eyebrow" for="cosearch">Search companies</label><input id="cosearch" class="search" type="search" placeholder="Try HITT, Suffolk, Clayco…" autocomplete="off">
+    <div class="cowrap" id="colist"></div>`;
+  const box=p.querySelector("#colist");
+  box.innerHTML=COS.map((c,i)=>`<div class="co" data-n="${esc(c.n.toLowerCase())}"><button type="button" class="cobtn" aria-expanded="false" data-i="${i}"><span class="n">${esc(c.n)}</span><span class="cbar">${c.d?`<span class="d" style="width:${c.d/max*100}%"></span>`:""}${c.m?`<span class="m" style="width:${c.m/max*100}%"></span>`:""}</span><span class="c">${c.d+c.m}</span><span class="x" aria-hidden="true">+</span></button></div>`).join("");
+  box.addEventListener("click",e=>{const b=e.target.closest(".cobtn");if(!b)return;const co=b.parentElement,c=COS[+b.dataset.i];
+    const open=!co.classList.contains("open");co.classList.toggle("open",open);b.setAttribute("aria-expanded",open);co.querySelector(".colist")?.remove();
+    if(open)co.insertAdjacentHTML("beforeend",`<div class="colist"><div class="eyebrow" style="text-transform:none;letter-spacing:0;padding:4px 0">${c.d} designed and posted · ${c.m} automated printing · first site ${fmt(c.first)}, ${c.first.slice(0,4)}</div>${c.list.map(rowHTML).join("")}</div>`)});
+  p.querySelector("#cosearch").addEventListener("input",e=>{const q=e.target.value.trim().toLowerCase();box.querySelectorAll(".co").forEach(c=>c.hidden=q&&!c.dataset.n.includes(q))});
+ },
+ pages(p){
+  const K={sol:["Solutions","--red-ui"],ind:["Industries","--blue-ui"],cs:["Customer stories","--yellow"],oth:["Company and site","--ink-3"]};
+  const cnt=k=>SITEP.filter(x=>kind(x[1])===k).length;
+  p.innerHTML=head(`${SITEP.length} web pages`,`Live pages on sitemetric.com I worked on, by the month each was created. Filter by page family, or open any page on the live site.`)+
+   `<div class="chips" role="group" aria-label="Filter pages"><button type="button" class="chip" data-k="all" aria-pressed="true">All · ${SITEP.length}</button>${Object.entries(K).map(([k,[n,c]])=>`<button type="button" class="chip" data-k="${k}" aria-pressed="false"><i style="background:var(${c})"></i>${n} · ${cnt(k)}</button>`).join("")}</div>
+   <div class="board" id="board"></div>`;
+  const pm={};SITEP.forEach(x=>(pm[x[0].slice(0,7)]??=[]).push(x));
+  p.querySelector("#board").innerHTML=Object.keys(pm).sort().map(k=>`<div class="bcol"><h3>${MON[+k.slice(5)-1]}<span>${pm[k].length}</span></h3>${pm[k].map(pgLink).join("")}</div>`).join("");
+  p.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{p.querySelectorAll(".chip").forEach(x=>x.setAttribute("aria-pressed",x===c));p.querySelectorAll(".pg").forEach(g=>g.classList.toggle("dim",c.dataset.k!=="all"&&g.dataset.k!==c.dataset.k))});
+ },
+ articles(p){
+  const ins=ARTS.filter(x=>x[1].startsWith("/insights")),res=ARTS.filter(x=>x[1].startsWith("/resources"));
+  const item=x=>`<a class="art" href="${SITE+x[1]}" target="_blank" rel="noopener"><time>${fmt(x[0])}</time><span>${esc(x[2])}</span></a>`;
+  p.innerHTML=head(`${ARTS.length} Insights and guides`,`Long-form content I built and loaded into the Insights and Resource Guides collections. Each one opens on the live site.`)+
+   `<div class="arts"><div><div class="mtitle"><h3>Insights articles</h3><span class="eyebrow">${ins.length}</span></div>${ins.map(item).join("")}</div>
+    <div><div class="mtitle"><h3>Resource guides</h3><span class="eyebrow">${res.length}</span></div>${res.map(item).join("")}</div></div>`;
+ },
+ month(p,i){
+  const k=MONTHS[i],list=byM(k),pages=P.filter(x=>x[0].startsWith(k));
+  const d=list.filter(b=>b[3]).length;
+  p.innerHTML=head(mlong(k),`${list.length} job sites (${d} designed and posted, ${list.length-d} automated printing)${pages.length?` and ${pages.length} pages on sitemetric.com`:""}.`)+
+   `<div class="split"><div><div class="mtitle"><h3>Job sites</h3><span class="eyebrow">${list.length}</span></div>
+      <div class="tiles" style="margin-bottom:12px">${list.map(b=>`<span class="tile ${b[3]?"d":"m"}" title="${esc(b[0]+" – "+b[1])}"></span>`).join("")}</div>
+      <div class="list">${list.map(rowHTML).join("")||'<div class="row"><span></span><span class="t">No new job sites this month.</span><span></span></div>'}</div></div>
+    <div><div class="mtitle"><h3>Web pages and content</h3><span class="eyebrow">${pages.length}</span></div>
+      <div style="display:flex;flex-direction:column;gap:4px">${pages.map(pgLink).join("")||'<div class="eyebrow" style="text-transform:none;letter-spacing:0">No pages launched this month. The site rebuild started in April 2026.</div>'}</div></div></div>`;
+ }
+};
+</script>
+
+</body></html>
